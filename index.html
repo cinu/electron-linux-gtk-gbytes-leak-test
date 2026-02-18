@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Tray Memory Leak Demo</title>
+  <style>
+    body { font-family: monospace; padding: 20px; }
+    #info { white-space: pre; font-size: 14px; line-height: 1.6; }
+    button { margin-bottom: 16px; padding: 6px 16px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <button id="start">Start Tray Icon Loop</button>
+  <button id="stop" disabled>Stop</button>
+  <div id="info">Press button to start...</div>
+  <script>
+    const info = document.getElementById('info');
+    const startBtn = document.getElementById('start');
+    const stopBtn = document.getElementById('stop');
+    startBtn.addEventListener('click', () => {
+      info.textContent = 'Running...';
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      window.api.startLoop();
+    });
+    stopBtn.addEventListener('click', () => {
+      stopBtn.disabled = true;
+      window.api.stopLoop();
+    });
+    window.api.onUpdate((d) => {
+      info.textContent =
+        `Tray icon sets: ${d.counter} / 100\n` +
+        `RSS:        ${d.rss} MB\n` +
+        `Heap Used:  ${d.heapUsed} MB\n` +
+        `Heap Total: ${d.heapTotal} MB\n\n` +
+        `Electron: ${d.electronVersion}\n` +
+        `Chrome:   ${d.chromeVersion}\n` +
+        `Node:     ${d.nodeVersion}`;
+    });
+    window.api.onStopped(() => {
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+    });
+  </script>
+</body>
+</html>
